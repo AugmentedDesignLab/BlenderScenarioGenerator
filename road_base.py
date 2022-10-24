@@ -206,22 +206,6 @@ class PR_OT_road(bpy.types.Operator):
         vertices, edges, faces = self.get_road_vertices_edges_faces(road_sample_points)
         materials = self.get_face_materials(lanes, strips_s_boundaries)
 
-        '''
-        if wireframe:
-            # Transform start and end point to local coordinate system then add
-            # a vertical edge down to the xy-plane to make elevation profile
-            # more easily visible
-            point_start = (self.geometry.params['point_start'])
-            point_start_local = (0.0, 0.0, 0.0)
-            point_start_bottom = (0.0, 0.0, -point_start.z)
-            point_end = self.geometry.params['point_end']
-            point_end_local = self.geometry.matrix_world.inverted() @ point_end
-            point_end_local.z = point_end.z - point_start.z
-            point_end_bottom = (point_end_local.x, point_end_local.y, -point_start.z)
-            vertices += [point_start_local[:], point_start_bottom, point_end_local[:], point_end_bottom]
-            edges += [[len(vertices)-1, len(vertices)-2], [len(vertices)-3, len(vertices)-4]]
-        '''
-
         # Create blender mesh
         mesh = bpy.data.meshes.new('temp_road')
         mesh.from_pydata(vertices, edges, faces)
@@ -719,6 +703,15 @@ class PR_OT_road(bpy.types.Operator):
         '''
         self.init_state()
         self.create_3d_object(context)
+        # length_broken_line = context.scene.road_properties.length_broken_line
+        # self.set_lane_params(context.scene.road_properties)
+        # lanes = context.scene.road_properties.lanes
+        # # Get values in t and s direction where the faces of the road start and end
+        # strips_s_boundaries = self.get_strips_s_boundaries(lanes, length_broken_line)
+        # # Calculate meshes for Blender
+        # road_sample_points = self.get_road_sample_points(lanes, strips_s_boundaries)
+        # vertex_loc_middle = int(len(road_sample_points[5][0])/2)
+        # bpy.ops.mesh.primitive_cube_add(location = [road_sample_points[5][0][vertex_loc_middle][1]+5, road_sample_points[5][0][vertex_loc_middle][0], 0])
         return {'FINISHED'}
 
 def register():
