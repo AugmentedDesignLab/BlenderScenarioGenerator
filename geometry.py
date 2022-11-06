@@ -1,4 +1,4 @@
-from math import pi, ceil, cos, inf, sin, pi, degrees
+from math import pi, ceil, cos, inf, sin, pi, degrees, atan2
 import bpy
 from mathutils import Vector, Matrix
 import helper
@@ -208,7 +208,7 @@ class DSC_geometry_line(DSC_geometry):
 
     def sample_plan_view(self, s):
         x_s = s
-        y_s = 0
+        y_s = 0.0
         curvature = 0
         hdg_t = pi/2
         return x_s, y_s, curvature, hdg_t

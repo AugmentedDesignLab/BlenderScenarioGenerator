@@ -44,7 +44,7 @@ class PR_OT_road(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     snap_filter = 'OpenDRIVE'
-    geometry = DSC_geometry_line()
+    geometry = DSC_geometry_arc()
     
     params = {}
 
@@ -58,7 +58,7 @@ class PR_OT_road(bpy.types.Operator):
     def init_state(self):
         self.params_input = {
             'point_start': Vector((0.0,0.0,0.0)),
-            'point_end': Vector((0.0,30.0,0.0)),
+            'point_end': Vector((30.0,30.0,0.0)),
             'heading_start': 0,
             'heading_end': 0,
             'curvature_start': 0,
@@ -696,6 +696,15 @@ class PR_OT_road(bpy.types.Operator):
                 idx_face += 1
 
         return materials
+        
+    
+    def get_xyz_any_s(self, any_s, any_t):
+        x_s, y_s, curvature_plan_view, hdg_t = self.geometry.sample_plan_view(any_s)
+        vector_hdg_t = Vector((1.0, 0.0))
+        vector_hdg_t.rotate(Matrix.Rotation(hdg_t, 2))
+        xy = Vector((x_s, y_s)) + (any_t * vector_hdg_t)
+        xyz = Vector((xy.x, xy.y, 0.0))
+        return xyz, vector_hdg_t, curvature_plan_view
     
     def execute(self, context):
         '''
@@ -703,15 +712,8 @@ class PR_OT_road(bpy.types.Operator):
         '''
         self.init_state()
         self.create_3d_object(context)
-        # length_broken_line = context.scene.road_properties.length_broken_line
-        # self.set_lane_params(context.scene.road_properties)
-        # lanes = context.scene.road_properties.lanes
-        # # Get values in t and s direction where the faces of the road start and end
-        # strips_s_boundaries = self.get_strips_s_boundaries(lanes, length_broken_line)
-        # # Calculate meshes for Blender
-        # road_sample_points = self.get_road_sample_points(lanes, strips_s_boundaries)
-        # vertex_loc_middle = int(len(road_sample_points[5][0])/2)
-        # bpy.ops.mesh.primitive_cube_add(location = [road_sample_points[5][0][vertex_loc_middle][1]+5, road_sample_points[5][0][vertex_loc_middle][0], 0])
+        xyz, vector_hdg_t, curvature_plan_view = self.get_xyz_any_s(5.0, 5.0)
+        bpy.ops.mesh.primitive_circle_add(location = xyz)
         return {'FINISHED'}
 
 def register():
