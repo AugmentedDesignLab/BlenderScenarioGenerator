@@ -44,7 +44,7 @@ class PR_OT_road(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     snap_filter = 'OpenDRIVE'
-    geometry = DSC_geometry_arc()
+    geometry = DSC_geometry_line()
     
     params = {}
 
@@ -712,8 +712,12 @@ class PR_OT_road(bpy.types.Operator):
         '''
         self.init_state()
         self.create_3d_object(context)
-        xyz, vector_hdg_t, curvature_plan_view = self.get_xyz_any_s(5.0, 5.0)
-        bpy.ops.mesh.primitive_circle_add(location = xyz)
+        if ((self.geometry.__class__.__name__ == "DSC_geometry_arc") or (self.geometry.__class__.__name__ == "DSC_geometry_clothoid")):
+            xyz, vector_hdg_t, curvature_plan_view = self.get_xyz_any_s(5.0, 5.0)
+            bpy.ops.mesh.primitive_circle_add(location = xyz)
+        elif(self.geometry.__class__.__name__ == "DSC_geometry_line"):
+            xyz = self.geometry.get_xyz_point_given_st(25.0, 5.0)
+            bpy.ops.mesh.primitive_circle_add(location = xyz)       
         return {'FINISHED'}
 
 def register():
