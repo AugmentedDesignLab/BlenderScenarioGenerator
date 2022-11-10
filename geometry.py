@@ -210,7 +210,7 @@ class DSC_geometry_line(DSC_geometry):
         x_s = s
         y_s = 0
         curvature = 0
-        hdg_t = pi/2
+        hdg_t = pi/2      
         return x_s, y_s, curvature, hdg_t
 
 class DSC_geometry_clothoid(DSC_geometry):
