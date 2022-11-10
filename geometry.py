@@ -1,6 +1,6 @@
-from math import pi, ceil, cos, inf, sin, pi, degrees
+from math import pi, ceil, cos, inf, sin, pi, degrees, atan2, radians, sqrt
 import bpy
-from mathutils import Vector, Matrix
+from mathutils import Vector, Matrix, Euler
 import helper
 from pyclothoids import Clothoid
 
@@ -205,10 +205,30 @@ class DSC_geometry_line(DSC_geometry):
         self.params['heading_end'] = heading_start_line
         self.params['curvature_end'] = 0
         self.params['length'] = length
+    
+    # Since for this geometry, sample_plan_view below doesn't make sense,
+    # I'm writing another function just to get an xyz point somewhere along the road
+    def get_xyz_point_given_st(self, s=2.0, t=0.0):
+        x_start = self.params['point_start'].x
+        y_start = self.params['point_start'].y
+        x_end = self.params['point_end'].x
+        y_end = self.params['point_end'].y
+
+        start = Vector((x_start, y_start, 0.0))
+        end = Vector((x_end, y_end, 0.0))
+        road_vec = end - start
+        road_vec = road_vec.normalized()
+        road_point = road_vec * s
+        angle = atan2(s,t)
+        rotation_angle = (pi/2)-angle
+        eu = Euler((0.0, 0.0, rotation_angle), 'XYZ')
+        road_vec.rotate(eu)
+        xyz = road_vec * (sqrt((s**2) + (t**2)))
+        return xyz
 
     def sample_plan_view(self, s):
         x_s = s
-        y_s = 0
+        y_s = 0.0
         curvature = 0
         hdg_t = pi/2      
         return x_s, y_s, curvature, hdg_t

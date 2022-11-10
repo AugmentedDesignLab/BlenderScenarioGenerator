@@ -58,7 +58,7 @@ class PR_OT_road(bpy.types.Operator):
     def init_state(self):
         self.params_input = {
             'point_start': Vector((0.0,0.0,0.0)),
-            'point_end': Vector((30.0,0.0,0.0)),
+            'point_end': Vector((100.0,0.0,0.0)),
             'heading_start': 0,
             'heading_end': 0,
             'curvature_start': 2,
@@ -696,26 +696,17 @@ class PR_OT_road(bpy.types.Operator):
                 idx_face += 1
 
         return materials
-
-    def get_xyz_any_s(self, any_s, any_t):     
-        x_s, y_s, curvature_plan_view, hdg_t = self.geometry.sample_plan_view(any_s)        
-        vector_hdg_t = Vector((1.0, 0.0))       
-        vector_hdg_t.rotate(Matrix.Rotation(hdg_t, 2))        
-        xy = Vector((x_s, y_s)) + (any_t * vector_hdg_t)        
-        xyz = Vector((xy.x, xy.y, 0.0))       
-        return xyz 
-    
-    def get_one_s_value(self, strips_s_boundaries, length_fraction=0.50):
-        #There is always a padding of tuples in the first three and last three indices of strips_s_boundaries
-        s = strips_s_boundaries[3][1][int(length_fraction*len(strips_s_boundaries[3][1]))]
-        return s
-    
-    def get_xyz_for_one_s(self, strips_s_boundaries, lanes, length_fraction=0.50):
-        s = self.get_one_s_value(strips_s_boundaries, 0.1)
-        strips_t_values = self.get_strips_t_values(lanes, s)
-        # Obtain first curvature value
-        xyz_samples, curvature_abs = self.geometry.sample_cross_section(s, strips_t_values)
-        return xyz_samples
+            
+    def get_xyz_any_s(self, any_s, any_t):
+        if ((self.geometry.__class__.__name__ == "DSC_geometry_arc") or (self.geometry.__class__.__name__ == "DSC_geometry_clothoid")):
+            x_s, y_s, curvature_plan_view, hdg_t = self.geometry.sample_plan_view(any_s)
+            vector_hdg_t = Vector((1.0, 0.0))
+            vector_hdg_t.rotate(Matrix.Rotation(hdg_t, 2))
+            xy = Vector((x_s, y_s)) + (any_t * vector_hdg_t)
+            xyz = Vector((xy.x, xy.y, 0.0))
+        elif(self.geometry.__class__.__name__ == "DSC_geometry_line"):
+            xyz = self.geometry.get_xyz_point_given_st(any_s, any_t)
+        return xyz
     
     def get_roadside_object_location_and_rotation(self, xyz_samples, edge='left'):
         if edge=='left': edge_loc = xyz_samples[int(len(xyz_samples)-len(xyz_samples))]
@@ -734,15 +725,15 @@ class PR_OT_road(bpy.types.Operator):
         '''
         self.init_state()
         self.create_3d_object(context)
-        xyz = self.get_xyz_any_s(5.0, 5.0)
-        bpy.ops.mesh.primitive_circle_add(location = xyz)
-        #length_broken_line = context.scene.road_properties.length_broken_line
-        #self.set_lane_params(context.scene.road_properties)
-        #lanes = context.scene.road_properties.lanes
-        #strips_s_boundaries = self.get_strips_s_boundaries(lanes, length_broken_line)
-        #xyz_samples = self.get_xyz_for_one_s(strips_s_boundaries, lanes, 0.5) #get possible xyz for a single s
-        #spawn_point, rot_angle = self.get_roadside_object_location_and_rotation(xyz_samples, 'right')
-        #bpy.ops.mesh.primitive_cube_add(location = spawn_point, rotation = (0, 0, rot_angle))
+        # length_broken_line = context.scene.road_properties.length_broken_line
+        # self.set_lane_params(context.scene.road_properties)
+        # lanes = context.scene.road_properties.lanes
+        # # Get values in t and s direction where the faces of the road start and end
+        # strips_s_boundaries = self.get_strips_s_boundaries(lanes, length_broken_line)
+        # # Calculate meshes for Blender
+        # road_sample_points = self.get_road_sample_points(lanes, strips_s_boundaries)
+        # vertex_loc_middle = int(len(road_sample_points[5][0])/2)
+        # bpy.ops.mesh.primitive_cube_add(location = [road_sample_points[5][0][vertex_loc_middle][1]+5, road_sample_points[5][0][vertex_loc_middle][0], 0])
         return {'FINISHED'}
 
 def register():
