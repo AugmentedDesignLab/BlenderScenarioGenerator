@@ -58,7 +58,7 @@ class PR_OT_road(bpy.types.Operator):
     def init_state(self):
         self.params_input = {
             'point_start': Vector((0.0,0.0,0.0)),
-            'point_end': Vector((30.0,30.0,0.0)),
+            'point_end': Vector((100.0,0.0,0.0)),
             'heading_start': 0,
             'heading_end': 0,
             'curvature_start': 0,
@@ -696,15 +696,17 @@ class PR_OT_road(bpy.types.Operator):
                 idx_face += 1
 
         return materials
-        
-    
+            
     def get_xyz_any_s(self, any_s, any_t):
-        x_s, y_s, curvature_plan_view, hdg_t = self.geometry.sample_plan_view(any_s)
-        vector_hdg_t = Vector((1.0, 0.0))
-        vector_hdg_t.rotate(Matrix.Rotation(hdg_t, 2))
-        xy = Vector((x_s, y_s)) + (any_t * vector_hdg_t)
-        xyz = Vector((xy.x, xy.y, 0.0))
-        return xyz, vector_hdg_t, curvature_plan_view
+        if ((self.geometry.__class__.__name__ == "DSC_geometry_arc") or (self.geometry.__class__.__name__ == "DSC_geometry_clothoid")):
+            x_s, y_s, curvature_plan_view, hdg_t = self.geometry.sample_plan_view(any_s)
+            vector_hdg_t = Vector((1.0, 0.0))
+            vector_hdg_t.rotate(Matrix.Rotation(hdg_t, 2))
+            xy = Vector((x_s, y_s)) + (any_t * vector_hdg_t)
+            xyz = Vector((xy.x, xy.y, 0.0))
+        elif(self.geometry.__class__.__name__ == "DSC_geometry_line"):
+            xyz = self.geometry.get_xyz_point_given_st(any_s, any_t)
+        return xyz
     
     def execute(self, context):
         '''
@@ -712,12 +714,8 @@ class PR_OT_road(bpy.types.Operator):
         '''
         self.init_state()
         self.create_3d_object(context)
-        if ((self.geometry.__class__.__name__ == "DSC_geometry_arc") or (self.geometry.__class__.__name__ == "DSC_geometry_clothoid")):
-            xyz, vector_hdg_t, curvature_plan_view = self.get_xyz_any_s(5.0, 5.0)
-            bpy.ops.mesh.primitive_circle_add(location = xyz)
-        elif(self.geometry.__class__.__name__ == "DSC_geometry_line"):
-            xyz = self.geometry.get_xyz_point_given_st(25.0, 5.0)
-            bpy.ops.mesh.primitive_circle_add(location = xyz)       
+        xyz = self.get_xyz_any_s(15.0, -10.0)
+        bpy.ops.mesh.primitive_circle_add(location = xyz)       
         return {'FINISHED'}
 
 def register():

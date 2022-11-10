@@ -221,8 +221,7 @@ class DSC_geometry_line(DSC_geometry):
         road_point = road_vec * s
         angle = atan2(s,t)
         rotation_angle = (pi/2)-angle
-        if (t>=0.0): eu = Euler((0.0, 0.0, rotation_angle), 'XYZ')
-        else: eu = Euler((0.0, 0.0, -rotation_angle), 'XYZ')
+        eu = Euler((0.0, 0.0, rotation_angle), 'XYZ')
         road_vec.rotate(eu)
         xyz = road_vec * (sqrt((s**2) + (t**2)))
         return xyz
