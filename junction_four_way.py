@@ -13,12 +13,26 @@
 
 import bpy
 from mathutils import Vector, Matrix
-
 from math import pi
+import os
+import sys
+import importlib
+
+# Make a change to path to be able to find files in the current directory.
+dir = os.path.dirname(bpy.data.filepath)
+if not dir in sys.path:
+    sys.path.append(dir)
+
+# Below this, import all the other python scripts in this project.
+# Reload if the module python script has changed.
 import helper
+importlib.reload(helper)
 
+import road_base
+importlib.reload(road_base)
 
-class DSC_OT_junction_four_way(bpy.types.Operator):
+# Creates a 4 units x 4 units square for a junction along with incoming roads.
+class PR_OT_junction_four_way(bpy.types.Operator):
     bl_idname = 'pr.junction_four_way'
     bl_label = '4-way junction'
     bl_description = 'Create a junction'
@@ -26,6 +40,38 @@ class DSC_OT_junction_four_way(bpy.types.Operator):
 
     object_type = 'junction_4way'
     snap_filter = 'OpenDRIVE'
+
+    # Input parameters for this operator
+    # pendx and pendy doesn't really matter
+    pstartx: bpy.props.FloatProperty()
+    pstarty: bpy.props.FloatProperty()
+
+    locationx: bpy.props.FloatProperty()
+    locationy: bpy.props.FloatProperty()
+
+    #Define the two param dictionaries. These decide how the road will be constructed.
+    def init_state(self):
+        self.params_input = {
+            'point_start': Vector((self.pstartx,self.pstarty,0.0)),
+            'point_end': Vector((0.0,0.0,0.0)),
+            'heading_start': 0,
+            'heading_end': 0,
+            'curvature_start': 2,
+            'curvature_end': 0,
+            'slope_start': 0,
+            'slope_end': 0,
+            'connected_start': True,
+            'connected_end': False,
+            'design_speed': 130.0,
+        }
+        self.params_snap = {
+            'id_obj': None,
+            'point': Vector((0.0,0.0,0.0)),
+            'type': 'cp_none',
+            'heading': 0,
+            'curvature': 0,
+            'slope': 0,
+        }
 
     def create_3d_object(self, context):
         '''
@@ -137,5 +183,29 @@ class DSC_OT_junction_four_way(bpy.types.Operator):
         # TODO implement material dictionary for the faces
         materials = {}
         return valid, mesh, matrix_world, materials
+    
+    # TODO Define a function that aligns the dimensions of the meshes
+    
+    def execute(self, context):
+        '''
+        Called every time your operator runs
+        '''
+        self.init_state()
+        bpy.ops.pr.road(pstartx=0.0, pstarty=0.0, pendx=20.0, pendy=0.0)
+        self.create_3d_object(context)
+        bpy.ops.pr.road(pstartx=28.0, pstarty=0.0, pendx=60.0, pendy=0.0)
+        bpy.ops.pr.road(pstartx=24.0, pstarty=4.0, pendx=24.0, pendy=50.0)
+        return {'FINISHED'}
+
+def register():
+    road_base.register()
+    bpy.utils.register_class(PR_OT_junction_four_way)  
+    
+def unregister():
+    road_base.unregister()
+    bpy.utils.unregister_class(PR_OT_junction_four_way)
+
+if __name__ == '__main__':
+    register()
 
 
