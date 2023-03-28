@@ -19,5 +19,22 @@ blender --python road_base.py
 bpy.ops.pr.road()
 ```
 
-This should generate a road in the 3D viewport.
+This should generate a road in the 3D viewport. You can do the same for any other Blender operator written.
+* Since we are using the Blender python, imports need to be done this way:
+```
+import os
+import sys
+import imp
+
+#Add this directory to path so that the files here can be found by Blender python
+
+dir = os.path.dirname(bpy.data.filepath)
+if not dir in sys.path:
+    sys.path.append(dir)
+
+# Below this, import all the python scripts in this project that are needed. Reload if the module python script has changed
+
+import helper
+imp.reload(helper)
+```
 * Edit code in a text editor, reload in the Blender text editor (using the exclamation point icon on top) and click play to re-register operations. This can be followed by re-running the previous step to have a programming workflow. 
