@@ -725,11 +725,16 @@ class PR_OT_road(bpy.types.Operator):
         '''
         self.init_state()
         self.create_3d_object(context)
-        # length_broken_line = context.scene.road_properties.length_broken_line
-        # self.set_lane_params(context.scene.road_properties)
-        # lanes = context.scene.road_properties.lanes
-        # # Get values in t and s direction where the faces of the road start and end
-        # strips_s_boundaries = self.get_strips_s_boundaries(lanes, length_broken_line)
+        #length_broken_line = context.scene.road_properties.length_broken_line
+        #self.set_lane_params(context.scene.road_properties)
+        #lanes = context.scene.road_properties.lanes
+        # Get values in t and s direction where the faces of the road start and end
+        #strips_s_boundaries = self.get_strips_s_boundaries(lanes, length_broken_line)
+        #for s in strips_s_boundaries[3][1]:
+        #    strips_t_values = self.get_strips_t_values(lanes, s)
+        #    xyz_samples, curvature_abs = self.geometry.sample_cross_section(s, strips_t_values)
+        #    bpy.ops.mesh.primitive_circle_add(location=xyz_samples[0])
+        #    break
         # # Calculate meshes for Blender
         # road_sample_points = self.get_road_sample_points(lanes, strips_s_boundaries)
         # vertex_loc_middle = int(len(road_sample_points[5][0])/2)

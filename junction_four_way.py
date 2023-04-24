@@ -15,7 +15,18 @@ import bpy
 from mathutils import Vector, Matrix
 
 from math import pi
+import os
+import sys
+import imp
+
+dir = os.path.dirname(bpy.data.filepath)
+if not dir in sys.path:
+    sys.path.append(dir)
+
+# Below this, import all the other python scripts in this project.
+# Reload if the module python script has changed.
 import helper
+imp.reload(helper)
 
 
 class DSC_OT_junction_four_way(bpy.types.Operator):

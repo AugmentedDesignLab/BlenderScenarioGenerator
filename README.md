@@ -6,7 +6,7 @@ Generate roads and scenarios for testing autonomous vehicles in simulation using
 * Add the [Blender installation directory](https://docs.blender.org/manual/en/latest/advanced/command_line/launch/index.html) to the environment variable such that the command *blender* can be accessed from the command line. [Here](https://docs.blender.org/manual/en/latest/advanced/command_line/launch/macos.html) are the instructions for doing so on MacOS and [here](https://docs.blender.org/manual/en/latest/advanced/command_line/launch/windows.html) are the instructions for doing so on Windows.
 * For the python installation in Blender, install the python package *scenariogeneration.* This package contains autonomous vehicle scenario generation scripts, particularly in the OpenDRIVE and OpenSCENARIO formats. This can be done using the command 
 ```
-"<path-to-blender-python-directory>/bin/python" -m pip install scenariogeneration --target "<path-to-blender-python-directory>\lib\site-packages
+"<path-to-blender-python-directory>/bin/python" -m pip install scenariogeneration --target "<path-to-blender-python-directory>\lib\site-packages"
 ``` 
 This will ensure the package is installed and accessible by the Blender python installation. 
 * Clone this repository and change directory to the project root. 
